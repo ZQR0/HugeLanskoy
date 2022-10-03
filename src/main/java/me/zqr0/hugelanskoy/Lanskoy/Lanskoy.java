@@ -66,9 +66,8 @@ public class Lanskoy {
                 if (entity instanceof LivingEntity) {
                     LivingEntity livingEntity = (LivingEntity) entity;
                     if (livingEntity instanceof Player) {
-                        Player player = (Player) livingEntity;
 
-                        return player;
+                        return (Player) livingEntity;
                     }
 
                     return livingEntity;
