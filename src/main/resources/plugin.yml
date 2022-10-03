@@ -1,0 +1,6 @@
+name: HugeLanskoy
+version: '${project.version}'
+main: me.zqr0.hugelanskoy.Plugin
+api-version: 1.19
+authors: [ ZQR0 ]
+website: https://zqr0.github.io/Website/
