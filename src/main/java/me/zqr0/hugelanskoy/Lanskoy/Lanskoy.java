@@ -1,10 +1,12 @@
 package me.zqr0.hugelanskoy.Lanskoy;
 
+import me.zqr0.hugelanskoy.Plugin;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,6 +43,11 @@ public class Lanskoy {
         playerDirection.normalize();
     }
 
+    public void startLanskoy() {
+        this.findEntitiesNearby();
+        this.startToMove();
+    }
+
     public boolean isAggressive() {
         return this.isAggressive;
     }
@@ -53,20 +60,27 @@ public class Lanskoy {
         return this.uuid;
     }
 
-    private Entity findEntitiesNearby(Giant giant) {
+    public boolean isDead() {
+        return this.giantMobEntity.isDead();
+    }
+
+    public boolean isInWater() {
+        return this.giantMobEntity.isInWater();
+    }
+
+    private LivingEntity findEntitiesNearby() {
 
         try {
 
-            List<Entity> entityList = (List<Entity>) Objects.requireNonNull(giant
+            List<Entity> entityList = (List<Entity>) Objects.requireNonNull(this.giantMobEntity
                             .getLocation()
                             .getWorld())
-                    .getNearbyEntities(giant.getLocation(), 15, 15, 15);
+                    .getNearbyEntities(this.giantMobEntity.getLocation(), 40, 40, 40);
 
             for (Entity entity : entityList) {
                 if (entity instanceof LivingEntity) {
                     LivingEntity livingEntity = (LivingEntity) entity;
                     if (livingEntity instanceof Player) {
-
                         return (Player) livingEntity;
                     }
 
@@ -80,5 +94,30 @@ public class Lanskoy {
         }
 
         return null;
+    }
+
+
+    private void startToMove() {
+        final Lanskoy lanskoy = this;
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                LivingEntity livingLanskoy = lanskoy.giantMobEntity;
+
+                if (lanskoy.isDead()) {
+                    return;
+                }
+
+                Entity target = lanskoy.findEntitiesNearby();
+
+                double xDiff = target.getLocation().getX() - livingLanskoy.getEyeLocation().getX();
+                double yDiff = target.getLocation().getY() - livingLanskoy.getEyeLocation().getY();
+                double zDiff = target.getLocation().getZ() - livingLanskoy.getEyeLocation().getZ();
+                double distanceXZ = Math.sqrt(xDiff * xDiff + zDiff * zDiff);
+                double distanceY = Math.sqrt(distanceXZ * distanceXZ + yDiff * yDiff);
+            }
+
+        }.runTask(Plugin.getPlugin(Plugin.class));
     }
 }
