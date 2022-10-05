@@ -95,6 +95,16 @@ public class Lanskoy {
         return null;
     }
 
+    private void attackEntity() {
+        try {
+            LivingEntity target = this.findEntitiesNearby();
+
+            assert target != null;
+            this.giantMobEntity.attack(target);
+        } catch (NullPointerException ex) {
+            ex.printStackTrace();
+        }
+    }
 
     private void startToMove() {
         final Lanskoy lanskoy = this;
