@@ -1,6 +1,7 @@
 package me.zqr0.hugelanskoy.Lanskoy;
 
 import me.zqr0.hugelanskoy.Plugin;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
@@ -46,6 +47,7 @@ public class Lanskoy {
     public void startLanskoy() {
         this.findEntitiesNearby();
         this.startToMove();
+        this.attackEntity();
     }
 
     public boolean isAggressive() {
@@ -96,11 +98,17 @@ public class Lanskoy {
     }
 
     private void attackEntity() {
+        final Lanskoy lanskoy = this;
+
         try {
             LivingEntity target = this.findEntitiesNearby();
+            LivingEntity livingLanskoy = (LivingEntity) lanskoy;
 
             assert target != null;
-            this.giantMobEntity.attack(target);
+            if (!(lanskoy.isDead())) {
+                livingLanskoy.getLocation().setDirection(target.getLocation().toVector());
+                livingLanskoy.attack(target);
+            }
         } catch (NullPointerException ex) {
             ex.printStackTrace();
         }
