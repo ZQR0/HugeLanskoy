@@ -1,7 +1,6 @@
 package me.zqr0.hugelanskoy.Lanskoy;
 
 import me.zqr0.hugelanskoy.Plugin;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
@@ -21,6 +20,7 @@ public class Lanskoy {
     private Location playerLocation;
     private UUID uuid;
     private final String NAME = "Lanskoy";
+    private int giantInOnePlaceTimes;
 
     Lanskoy(@NotNull Location playerLocation, boolean isAggressive) {
         this.isAggressive = isAggressive;
@@ -69,7 +69,6 @@ public class Lanskoy {
     }
 
     private LivingEntity findEntitiesNearby() {
-
         try {
 
             List<Entity> entityList = (List<Entity>) Objects.requireNonNull(this.giantMobEntity
@@ -111,13 +110,92 @@ public class Lanskoy {
 
                 Entity target = lanskoy.findEntitiesNearby();
 
+                assert target != null;
                 double xDiff = target.getLocation().getX() - livingLanskoy.getEyeLocation().getX();
                 double yDiff = target.getLocation().getY() - livingLanskoy.getEyeLocation().getY();
                 double zDiff = target.getLocation().getZ() - livingLanskoy.getEyeLocation().getZ();
                 double distanceXZ = Math.sqrt(xDiff * xDiff + zDiff * zDiff);
                 double distanceY = Math.sqrt(distanceXZ * distanceXZ + yDiff * yDiff);
+
+                float newYaw = (float) Math.toDegrees(Math.atan2(zDiff, xDiff)) - 90;
+                float newPitch = (float) Math.toDegrees(Math.acos(yDiff / distanceY)) - 90;
+
+                livingLanskoy.setRotation(newYaw, newPitch);
+
+                Location giantLoc = livingLanskoy.getLocation().clone();
+                Location giantLocXZ = livingLanskoy.getLocation().clone();
+                giantLocXZ.setY(0);
+                double giantMobY = giantLoc.clone().getY();
+
+                Location targetLoc = target.getLocation().clone();
+                Location targetLocXZ = target.getLocation().clone();
+                targetLocXZ.setY(0);
+                double targetY = targetLoc.clone().getY();
+
+                if ((giantLocXZ.distance(targetLocXZ) > 1) || ( ((targetY - giantMobY) > 20) && (giantMobY < targetY)) ) {
+                    double oldX = giantLoc.getX();
+                    double oldZ = giantLoc.getZ();
+
+
+                    if (livingLanskoy.getEyeLocation().clone().add(0, 1, 0).getBlock().getType() == Material.WATER) {
+                        livingLanskoy.setVelocity((giantLoc.getDirection().clone().normalize().setY(1.4)));
+                        return;
+                    }
+
+                    livingLanskoy.setRemainingAir(livingLanskoy.getMaximumAir());
+                    livingLanskoy.setVelocity(giantLoc.getDirection().clone().normalize().setY(-4.5));
+
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            if (livingLanskoy.isDead()) {
+                                this.cancel();
+                            }
+
+                            if ((Math.abs(livingLanskoy.getLocation().getX() - oldX) < 1) && (Math.abs(livingLanskoy.getLocation().getZ() - oldZ) < 1)&& ((giantMobY < targetY) || (giantLocXZ.distance(targetLocXZ) > 2.5))) {
+
+                                lanskoy.giantInOnePlaceTimes++;
+
+                                if (lanskoy.giantInOnePlaceTimes <= 2) {
+                                    livingLanskoy.setVelocity(
+                                            giantLoc.getDirection().clone().normalize().multiply(1).setY(1)
+                                    );
+                                } else if (lanskoy.giantInOnePlaceTimes == 4) {
+                                    livingLanskoy.setVelocity(
+                                            giantLoc.getDirection().clone().normalize().multiply(1).setY(4)
+                                    );
+                                } else if (lanskoy.giantInOnePlaceTimes == 8) {
+                                    livingLanskoy.setVelocity(
+                                            giantLoc.getDirection().clone().normalize().rotateAroundY(0.9).multiply(2).setY(5)
+                                    );
+                                } else if (lanskoy.giantInOnePlaceTimes == 10) {
+                                    livingLanskoy.setVelocity(
+                                            giantLoc.getDirection().clone().normalize().rotateAroundY(-0.9).multiply(2).setY(5)
+                                    );
+                                } else if (lanskoy.giantInOnePlaceTimes == 12) {
+                                    livingLanskoy.setVelocity(
+                                            giantLoc.getDirection().clone().normalize().rotateAroundY(-0.9).multiply(2).setY(5)
+                                    );
+                                } else if (lanskoy.giantInOnePlaceTimes == 14) {
+                                    livingLanskoy.setVelocity(
+                                            giantLoc.getDirection().clone().normalize().rotateAroundY(0.9).multiply(2).setY(5)
+                                    );
+                                } else if (lanskoy.giantInOnePlaceTimes == 16) {
+                                    livingLanskoy.setVelocity(
+                                            giantLoc.getDirection().clone().normalize().rotateAroundY(-0.9).multiply(2).setY(5)
+                                    );
+
+                                    lanskoy.giantInOnePlaceTimes = 0;
+                                }
+                            } else {
+                                lanskoy.giantInOnePlaceTimes = 0;
+                            }
+                        }
+                    }.runTaskLater(Plugin.getPlugin(Plugin.class), 7);
+                }
+
             }
 
-        }.runTask(Plugin.getPlugin(Plugin.class));
+        }.runTaskTimer(Plugin.getPlugin(Plugin.class), 0, 10);
     }
 }
