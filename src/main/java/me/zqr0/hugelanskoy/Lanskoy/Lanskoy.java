@@ -3,6 +3,7 @@ package me.zqr0.hugelanskoy.Lanskoy;
 import me.zqr0.hugelanskoy.Plugin;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.block.data.type.Fire;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -22,7 +23,7 @@ public class Lanskoy{
     private final String NAME = "Lanskoy";
     private int giantInOnePlaceTimes;
 
-    public Lanskoy(@NotNull Location playerLocation, boolean isAggressive) {
+    public Lanskoy(@NotNull Location playerLocation, @NotNull boolean isAggressive) {
         this.isAggressive = isAggressive;
         this.playerLocation = playerLocation;
 
@@ -37,7 +38,7 @@ public class Lanskoy{
 
         this.giantMobEntity.setCustomName(this.NAME);
         this.giantMobEntity.setCustomNameVisible(true);
-        Objects.requireNonNull(this.giantMobEntity.getEquipment()).setItemInMainHand(new ItemStack(Material.IRON_AXE));
+        Objects.requireNonNull(this.giantMobEntity.getEquipment()).setItemInMainHand(new ItemStack(Material.IRON_SWORD));
 
         playerDirection.setY(0);
         playerDirection.normalize();
@@ -97,21 +98,41 @@ public class Lanskoy{
         return null;
     }
 
+    private Vector generateVector(@NotNull Location a, @NotNull Location b) {
+        return locationToVector(b).clone().subtract(locationToVector(a)).normalize();
+    }
+
+    private Vector locationToVector(@NotNull Location location) {
+        return new Vector(location.getX(), location.getY(), location.getZ());
+    }
+
     private void attackEntity() {
         final Lanskoy lanskoy = this;
+        LivingEntity target = this.findEntitiesNearby();
 
-        try {
-            LivingEntity target = this.findEntitiesNearby();
-            Giant livingLanskoy = (Giant) lanskoy;
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                try {
+                    LivingEntity livingLanskoy = lanskoy.giantMobEntity;
 
-            assert target != null;
-            if (!(lanskoy.isDead())) {
-                livingLanskoy.getLocation().setDirection(target.getLocation().toVector());
-                livingLanskoy.attack(target);
+                    assert target != null;
+
+                    if (livingLanskoy.isDead()) {
+                        return;
+                    }
+
+                    Fireball fireball = (Fireball) livingLanskoy.getWorld().spawnEntity(livingLanskoy.getEyeLocation().clone()
+                                    .add(generateVector(livingLanskoy.getEyeLocation().clone(), target.getLocation()).clone().multiply(3.5)).clone()
+                                    .add(0, -2, 0),
+                            EntityType.FIREBALL
+                    );
+                    fireball.setDirection(generateVector(fireball.getLocation(), target.getLocation()).clone().multiply(2));
+                } catch (NullPointerException | AssertionError ex) {
+                    ex.printStackTrace();
+                }
             }
-        } catch (NullPointerException ex) {
-            ex.printStackTrace();
-        }
+        }.runTaskTimer(Plugin.getPlugin(Plugin.class), 0, 30);
     }
 
     private void startToMove() {
