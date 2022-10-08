@@ -1,7 +1,6 @@
 package me.zqr0.hugelanskoy.Lanskoy;
 
 import me.zqr0.hugelanskoy.Plugin;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.*;
@@ -14,7 +13,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-public class Lanskoy {
+public class Lanskoy{
 
     private boolean isAggressive;
     private final Giant giantMobEntity;
@@ -23,7 +22,7 @@ public class Lanskoy {
     private final String NAME = "Lanskoy";
     private int giantInOnePlaceTimes;
 
-    Lanskoy(@NotNull Location playerLocation, boolean isAggressive) {
+    public Lanskoy(@NotNull Location playerLocation, boolean isAggressive) {
         this.isAggressive = isAggressive;
         this.playerLocation = playerLocation;
 
@@ -70,6 +69,7 @@ public class Lanskoy {
         return this.giantMobEntity.isInWater();
     }
 
+
     private LivingEntity findEntitiesNearby() {
         try {
 
@@ -102,7 +102,7 @@ public class Lanskoy {
 
         try {
             LivingEntity target = this.findEntitiesNearby();
-            LivingEntity livingLanskoy = (LivingEntity) lanskoy;
+            Giant livingLanskoy = (Giant) lanskoy;
 
             assert target != null;
             if (!(lanskoy.isDead())) {
