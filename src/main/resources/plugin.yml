@@ -11,3 +11,13 @@ commands:
       - ga
       - getAuthor
     usage: /ga
+
+  lanskoy:
+    aliases:
+      - lnsk
+    usage: /lnsk
+
+  setgamemode:
+    aliases:
+      - sg
+    usage: /sg < creative | survival >
