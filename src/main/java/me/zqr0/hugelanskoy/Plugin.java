@@ -1,8 +1,11 @@
 package me.zqr0.hugelanskoy;
 
 import me.zqr0.hugelanskoy.Commands.GetAuthor;
+import me.zqr0.hugelanskoy.Commands.SetGamemode;
+import me.zqr0.hugelanskoy.Commands.SetGamemodeCompleter;
 import me.zqr0.hugelanskoy.Commands.SpawnLanskoy;
 import me.zqr0.hugelanskoy.Events.LanskoyEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Plugin extends JavaPlugin {
@@ -14,8 +17,11 @@ public final class Plugin extends JavaPlugin {
         try {
             getCommand("getAuthor").setExecutor(new GetAuthor());
             getCommand("lanskoy").setExecutor(new SpawnLanskoy(this));
-        } catch (Exception ex) {
+            getCommand("setgamemode").setExecutor(new SetGamemode());
+            getCommand("setgamemode").setTabCompleter(new SetGamemodeCompleter());
+        } catch (NullPointerException ex) {
             ex.printStackTrace();
+            Bukkit.getPluginManager().disablePlugin(this);
         }
 
     }
