@@ -14,7 +14,7 @@ public class Manager {
         Bukkit.getPluginManager().registerEvents(new LanskoyEvent(this), thisPlugin);
     }
 
-    public void spawnLanskoy(@NotNull Location playerLocation, @NotNull boolean isAggressive) {
+    public void spawnLanskoy(@NotNull Location playerLocation, boolean isAggressive) {
         new Lanskoy(playerLocation, isAggressive).startLanskoy();
     }
 
