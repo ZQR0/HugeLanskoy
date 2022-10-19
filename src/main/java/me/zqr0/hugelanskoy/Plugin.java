@@ -13,9 +13,12 @@ public final class Plugin extends JavaPlugin {
         Plugin instance = this;
 
         try {
+            // Commands
             getCommand("getAuthor").setExecutor(new GetAuthor());
             getCommand("lanskoy").setExecutor(new SpawnLanskoy(instance));
             getCommand("setgamemode").setExecutor(new SetGamemode());
+
+            // Tab-completers
             getCommand("setgamemode").setTabCompleter(new SetGamemodeCompleter());
         } catch (NullPointerException ex) {
             ex.printStackTrace();
