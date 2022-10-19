@@ -13,7 +13,7 @@ public class SetGamemodeCompleter implements TabCompleter {
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length != 0) {
-            return List.of("creative", "survival");
+            return List.of("creative", "survival", "spectator");
         }
 
         return null;

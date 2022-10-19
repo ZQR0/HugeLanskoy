@@ -22,13 +22,17 @@ public class SetGamemode implements CommandExecutor {
             else if (args[0].equalsIgnoreCase("survival")) {
                 player.setGameMode(GameMode.SURVIVAL);
                 return true;
+            } else if (args[0].equalsIgnoreCase("spectator")) {
+                player.setGameMode(GameMode.SPECTATOR);
+                return true;
+            } else {
+                player.sendMessage(ChatColor.YELLOW + "Choose the valid gamemode type");
+                return false;
             }
         } catch (NullPointerException ex) {
             ex.printStackTrace();
             player.sendMessage(ChatColor.RED + "Can't change your gamemode\nERROR");
             return false;
         }
-
-        return false;
     }
 }
